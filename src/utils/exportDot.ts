@@ -38,23 +38,8 @@ export function exportToDot(editor: Editor): string {
   // Add text nodes
   dot += '  // Text nodes\n'
   textShapes.forEach((shape) => {
-    // Extract text from richText structure
-    const richText = (shape.props as any).richText
-    let textContent = ''
-
-    if (richText && richText.content && Array.isArray(richText.content)) {
-      // Extract text from richText content array
-      textContent = richText.content
-        .map((paragraph: any) => {
-          if (paragraph.content && Array.isArray(paragraph.content)) {
-            return paragraph.content
-              .map((textNode: any) => textNode.text || '')
-              .join('')
-          }
-          return ''
-        })
-        .join('\n')
-    }
+    // In tldraw 3.x, text is stored directly in props.text
+    const textContent = (shape.props as any).text || ''
 
     // Create node ID from slug + short ID
     const slug = createSlug(textContent) || 'node'
@@ -90,22 +75,8 @@ export function exportToDot(editor: Editor): string {
       const toNodeId = shapeToNodeId.get(endBinding.toId)
 
       if (fromNodeId && toNodeId) {
-        // Extract arrow label text from richText if it exists
-        const richText = (arrow.props as any).richText
-        let arrowText = ''
-
-        if (richText && richText.content && Array.isArray(richText.content)) {
-          arrowText = richText.content
-            .map((paragraph: any) => {
-              if (paragraph.content && Array.isArray(paragraph.content)) {
-                return paragraph.content
-                  .map((textNode: any) => textNode.text || '')
-                  .join('')
-              }
-              return ''
-            })
-            .join('\n')
-        }
+        // In tldraw 3.x, arrow text is stored directly in props.text
+        const arrowText = (arrow.props as any).text || ''
 
         if (arrowText) {
           // Escape quotes and newlines for DOT format

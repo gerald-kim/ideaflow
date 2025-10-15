@@ -1,6 +1,7 @@
 import {
   Tldraw,
   ArrowShapeUtil,
+  TextShapeUtil,
   Editor,
   createShapeId,
   DefaultMainMenu,
@@ -31,8 +32,15 @@ class CustomArrowShapeUtil extends ArrowShapeUtil {
   }
 }
 
+// 커스텀 TextShapeUtil: resize 비활성화
+class CustomTextShapeUtil extends TextShapeUtil {
+  override canResize(): boolean {
+    return false
+  }
+}
+
 // 커스텀 shape utils
-const customShapeUtils = [CustomArrowShapeUtil]
+const customShapeUtils = [CustomArrowShapeUtil, CustomTextShapeUtil]
 
 // Arrow 검증: Text/Frame에만 연결 가능하도록 제한
 function setupArrowValidation(editor: Editor) {
@@ -100,13 +108,26 @@ function setupTextShortcut(editor: Editor) {
       // 새 텍스트 shape ID 생성
       const id = createShapeId()
 
-      // 커서 위치에 텍스트 shape 생성
+      // 먼저 클릭 위치에 텍스트 shape 생성
       editor.createShape<TLTextShape>({
         id,
         type: 'text',
         x: currentPagePoint.x,
         y: currentPagePoint.y,
       })
+
+      // 생성된 shape의 실제 bounds를 가져와서 높이의 절반만큼 위로 이동 (tldraw 방식)
+      const shape = editor.getShape<TLTextShape>(id)
+      if (shape) {
+        const bounds = editor.getShapePageBounds(shape)
+        if (bounds) {
+          editor.updateShape({
+            ...shape,
+            x: shape.x,
+            y: shape.y - bounds.height / 2,
+          })
+        }
+      }
 
       // 생성된 텍스트를 선택하고 편집 모드로 전환
       editor.select(id)
@@ -167,7 +188,7 @@ function App() {
   return (
     <div style={{ position: 'fixed', inset: 0 }}>
       <Tldraw
-        persistenceKey="ideaflow-v1"
+        persistenceKey="ideaflow-v3"
         assetUrls={customAssetUrls}
         shapeUtils={customShapeUtils}
         onMount={(editor) => {
