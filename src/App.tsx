@@ -13,6 +13,7 @@ import {
 import type { TLTextShape, TLShapeId } from '@tldraw/tlschema'
 import 'tldraw/tldraw.css'
 import { exportToDot, downloadDotFile } from './utils/exportDot'
+import { exportDiagram, importDiagram, newDiagram } from './utils/saveLoad'
 
 // assetUrls를 컴포넌트 외부에 정의 (리렌더링 방지)
 const customAssetUrls = {
@@ -145,17 +146,48 @@ function setupTextShortcut(editor: Editor) {
   }
 }
 
-// Custom Main Menu component with DOT export
+// Custom Main Menu component with file operations and DOT export
 function CustomMainMenu() {
   const editor = useEditor()
 
   return (
     <DefaultMainMenu>
+      <TldrawUiMenuGroup id="file-operations">
+        <TldrawUiMenuItem
+          id="new-diagram"
+          label="New Diagram"
+          icon="plus"
+          kbd="$n"
+          onSelect={() => {
+            newDiagram(editor)
+          }}
+        />
+        <TldrawUiMenuItem
+          id="save-diagram"
+          label="Save as File"
+          icon="save"
+          kbd="$s"
+          readonlyOk
+          onSelect={() => {
+            exportDiagram(editor)
+          }}
+        />
+        <TldrawUiMenuItem
+          id="load-diagram"
+          label="Load from File"
+          icon="folder"
+          kbd="$o"
+          onSelect={() => {
+            importDiagram(editor)
+          }}
+        />
+      </TldrawUiMenuGroup>
       <TldrawUiMenuGroup id="export-dot-group">
         <TldrawUiMenuItem
           id="export-dot"
           label="Export as DOT"
           icon="external-link"
+          kbd="$e"
           readonlyOk
           onSelect={() => {
             const dotContent = exportToDot(editor)

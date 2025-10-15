@@ -27,7 +27,7 @@ export function exportToDot(editor: Editor): string {
     return text
       .toLowerCase()
       .trim()
-      .replace(/[^\w\s-]/g, '') // Remove special characters
+      .replace(/[^\w\s]/g, '') // Remove special characters (including -)
       .replace(/\s+/g, '_') // Replace spaces with underscore
       .substring(0, 30) // Limit length
   }
@@ -38,11 +38,31 @@ export function exportToDot(editor: Editor): string {
   // Add text nodes
   dot += '  // Text nodes\n'
   textShapes.forEach((shape) => {
-    // In tldraw 3.x, text is stored directly in props.text
-    const textContent = (shape.props as any).text || ''
+    // In tldraw 3.x, text is stored in props.richText
+    const richText = (shape.props as any).richText
+    let textContent = ''
+
+    if (richText && richText.content && Array.isArray(richText.content)) {
+      // Extract text from richText structure
+      textContent = richText.content
+        .map((node: any) => {
+          if (node.type === 'paragraph' && node.content && Array.isArray(node.content)) {
+            return node.content
+              .filter((item: any) => item.type === 'text')
+              .map((item: any) => item.text || '')
+              .join('')
+          }
+          return ''
+        })
+        .join('\n')
+    }
 
     // Create node ID from slug + short ID
-    const slug = createSlug(textContent) || 'node'
+    let slug = createSlug(textContent) || 'node'
+    // Ensure slug starts with a letter (DOT requirement)
+    if (slug && /^[0-9]/.test(slug)) {
+      slug = 'n' + slug
+    }
     // Extract just the unique part after 'shape:' prefix
     const idPart = shape.id.includes(':') ? shape.id.split(':')[1] : shape.id
     const shortId = idPart
@@ -75,7 +95,7 @@ export function exportToDot(editor: Editor): string {
       const toNodeId = shapeToNodeId.get(endBinding.toId)
 
       if (fromNodeId && toNodeId) {
-        // In tldraw 3.x, arrow text is stored directly in props.text
+        // In tldraw 3.x, arrow text is stored in props.text
         const arrowText = (arrow.props as any).text || ''
 
         if (arrowText) {
