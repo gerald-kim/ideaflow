@@ -1,6 +1,17 @@
-import { Tldraw, ArrowShapeUtil, Editor, createShapeId } from 'tldraw'
-import type { TLTextShape } from '@tldraw/tlschema'
+import {
+  Tldraw,
+  ArrowShapeUtil,
+  Editor,
+  createShapeId,
+  DefaultMainMenu,
+  DefaultMainMenuContent,
+  TldrawUiMenuItem,
+  TldrawUiMenuGroup,
+  useEditor,
+} from 'tldraw'
+import type { TLTextShape, TLShapeId } from '@tldraw/tlschema'
 import 'tldraw/tldraw.css'
+import { exportToDot, downloadDotFile } from './utils/exportDot'
 
 // assetUrls를 컴포넌트 외부에 정의 (리렌더링 방지)
 const customAssetUrls = {
@@ -25,10 +36,10 @@ const customShapeUtils = [CustomArrowShapeUtil]
 
 // Arrow 검증: Text/Frame에만 연결 가능하도록 제한
 function setupArrowValidation(editor: Editor) {
-  const creatingArrows = new Set<string>() // 현재 생성 중인 arrow ID들
+  const creatingArrows = new Set<TLShapeId>() // 현재 생성 중인 arrow ID들
   let isDrawing = false
 
-  const validateArrow = (arrowId: string) => {
+  const validateArrow = (arrowId: TLShapeId) => {
     const arrow = editor.getShape(arrowId)
     if (!arrow || arrow.type !== 'arrow') return
 
@@ -113,10 +124,50 @@ function setupTextShortcut(editor: Editor) {
   }
 }
 
+// Custom Main Menu component with DOT export
+function CustomMainMenu() {
+  const editor = useEditor()
+
+  return (
+    <DefaultMainMenu>
+      <TldrawUiMenuGroup id="export-dot-group">
+        <TldrawUiMenuItem
+          id="export-dot"
+          label="Export as DOT"
+          icon="external-link"
+          readonlyOk
+          onSelect={() => {
+            const dotContent = exportToDot(editor)
+            downloadDotFile(dotContent)
+          }}
+        />
+      </TldrawUiMenuGroup>
+      <DefaultMainMenuContent />
+    </DefaultMainMenu>
+  )
+}
+
+// Custom overrides for tldraw UI
+const uiOverrides = {
+  tools: (_editor: Editor, tools: any) => {
+    // Select, Hand, Arrow, Text, Frame만 남기고 나머지 제거
+    const allowedTools = ['select', 'hand', 'arrow', 'text', 'frame']
+
+    Object.keys(tools).forEach((toolId) => {
+      if (!allowedTools.includes(toolId)) {
+        delete tools[toolId]
+      }
+    })
+
+    return tools
+  },
+}
+
 function App() {
   return (
     <div style={{ position: 'fixed', inset: 0 }}>
       <Tldraw
+        persistenceKey="ideaflow-v1"
         assetUrls={customAssetUrls}
         shapeUtils={customShapeUtils}
         onMount={(editor) => {
@@ -125,19 +176,9 @@ function App() {
           // 't' 키 단축키 설정
           setupTextShortcut(editor)
         }}
-        overrides={{
-          tools: (_editor, tools) => {
-            // Select, Hand, Arrow, Text, Frame만 남기고 나머지 제거
-            const allowedTools = ['select', 'hand', 'arrow', 'text', 'frame']
-
-            Object.keys(tools).forEach((toolId) => {
-              if (!allowedTools.includes(toolId)) {
-                delete tools[toolId]
-              }
-            })
-
-            return tools
-          },
+        overrides={uiOverrides}
+        components={{
+          MainMenu: CustomMainMenu,
         }}
       />
     </div>

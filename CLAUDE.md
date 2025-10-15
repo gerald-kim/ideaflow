@@ -30,18 +30,19 @@ npm run preview
 - **Language**: TypeScript 5.9
 
 ### Application Structure
-The app has a minimal structure with two main files:
+The app has a minimal structure:
 - `src/main.tsx`: Entry point with React root rendering
 - `src/App.tsx`: Main application component containing all tldraw customization logic
+- `src/utils/exportDot.ts`: Graphviz DOT format export utility
 
 ### Key Customizations in App.tsx
 
-#### 1. Custom Arrow Shape Utility (lines 14-20)
+#### 1. Custom Arrow Shape Utility (lines 15-21)
 The `CustomArrowShapeUtil` extends tldraw's `ArrowShapeUtil` to restrict arrow binding:
 - Arrows can ONLY connect to `text` or `frame` shape types
 - This is enforced in the `canBind()` override method
 
-#### 2. Arrow Validation System (lines 26-66)
+#### 2. Arrow Validation System (lines 27-67)
 The `setupArrowValidation()` function enforces strict arrow connectivity rules:
 - Tracks arrows during creation using a Set (`creatingArrows`)
 - Listens to pointer_up events to detect when arrow drawing completes
@@ -49,7 +50,15 @@ The `setupArrowValidation()` function enforces strict arrow connectivity rules:
 - **Automatically deletes arrows** that don't have both endpoints connected to valid shapes (text/frame)
 - Uses tldraw's `sideEffects.registerAfterCreateHandler` and event system
 
-#### 3. Tool Restrictions (lines 78-91)
+#### 3. Text Shortcut (lines 69-114)
+The `setupTextShortcut()` function enables instant text creation at cursor position:
+- Press `t` key (physical key, works with both English and Korean keyboard layouts)
+- Creates text shape at current mouse cursor position
+- Immediately enters edit mode for typing
+- Uses `e.code === 'KeyT'` for language-agnostic detection
+- Skips when focus is on input fields
+
+#### 4. Tool Restrictions (lines 119-130)
 The `overrides.tools` configuration limits available tools to:
 - `select`: Selection tool
 - `hand`: Pan/hand tool
@@ -59,8 +68,22 @@ The `overrides.tools` configuration limits available tools to:
 
 All other default tldraw tools (geo shapes, draw, note, etc.) are removed.
 
-#### 4. Custom Font Configuration (lines 5-12)
+#### 5. DOT Export Feature (lines 131-157)
+Custom action and menu integration for exporting diagrams to Graphviz DOT format:
+- Added to hamburger menu as "Export as DOT"
+- Keyboard shortcut: `Cmd+E` (Mac) / `Ctrl+E` (Windows/Linux)
+- Exports text nodes and arrow connections as directed graph
+- Implementation in `src/utils/exportDot.ts`
+- Downloads as `.dot` file for use with Graphviz
+
+#### 6. Custom Font Configuration (lines 6-13)
 Uses Korean font "RIDIBatang" from CDN for all draw font variants instead of default fonts.
+
+#### 7. Persistence (line 164)
+The `persistenceKey="ideaflow-v1"` prop enables automatic persistence:
+- Saves diagram state to browser's IndexedDB
+- Automatically restores content on page reload
+- Supports cross-tab synchronization
 
 ### Important Implementation Details
 
