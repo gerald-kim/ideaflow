@@ -52,6 +52,11 @@ class CustomArrowShapeUtil extends ArrowShapeUtil {
     // Text와 Frame shape에만 연결 허용
     return toShapeType === 'text' || toShapeType === 'frame'
   }
+
+  override onTranslateStart(shape: TLArrowShape) {
+    return undefined  // 이동 시작 취소
+  }
+
 }
 
 // 커스텀 TextShapeUtil: resize 비활성화
