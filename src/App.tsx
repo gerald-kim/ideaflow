@@ -9,11 +9,32 @@ import {
   TldrawUiMenuItem,
   TldrawUiMenuGroup,
   useEditor,
+  FONT_SIZES,
+  STROKE_SIZES,
+  ARROW_LABEL_FONT_SIZES,
 } from 'tldraw'
 import type { TLTextShape, TLShapeId } from '@tldraw/tlschema'
 import 'tldraw/tldraw.css'
+import './App.css'
 import { exportToDot, downloadDotFile } from './utils/exportDot'
 import { exportDiagram, importDiagram, newDiagram } from './utils/saveLoad'
+
+// tldraw의 기본 크기 상수를 더 작게 재정의
+FONT_SIZES.s = 12
+FONT_SIZES.m = 16
+FONT_SIZES.l = 24
+FONT_SIZES.xl = 32
+
+STROKE_SIZES.s = 1
+STROKE_SIZES.m = 2
+STROKE_SIZES.l = 3
+STROKE_SIZES.xl = 5
+
+ARROW_LABEL_FONT_SIZES.s = 12
+ARROW_LABEL_FONT_SIZES.m = 14
+ARROW_LABEL_FONT_SIZES.l = 18
+ARROW_LABEL_FONT_SIZES.xl = 24
+
 
 // assetUrls를 컴포넌트 외부에 정의 (리렌더링 방지)
 const customAssetUrls = {
