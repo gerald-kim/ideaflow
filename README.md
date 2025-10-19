@@ -1,73 +1,44 @@
-# React + TypeScript + Vite
+# IdeaFlow
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A minimal, focused concept mapping tool for personal use. Built on top of tldraw, this editor restricts functionality to only the essentials: text nodes, frames, and arrows.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Minimal toolset**: Only text, frames, and arrows - no distractions
+- **Smart arrows**: Arrows can only connect to text or frames, and automatically delete if not properly connected
+- **Instant text creation**: Press `t` to create text at cursor position and start typing immediately
+- **Keyboard-first workflow**: Common operations accessible via keyboard shortcuts
+- **File operations**: Save/load diagrams as JSON files, or export to Graphviz DOT format
+- **Auto-persistence**: Diagrams automatically save to browser storage
+- **Compact sizing**: Reduced default font and stroke sizes for denser concept maps
 
-## React Compiler
+## Usage
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+# Install dependencies
+npm install
 
-## Expanding the ESLint configuration
+# Start development server
+npm run dev
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Build for production
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Keyboard Shortcuts
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- `t` - Create text at cursor position
+- `Cmd/Ctrl + N` - New diagram (clears canvas)
+- `Cmd/Ctrl + S` - Save diagram as file
+- `Cmd/Ctrl + O` - Load diagram from file
+- `Cmd/Ctrl + E` - Export as Graphviz DOT
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Tech Stack
+
+- React 19 + TypeScript
+- tldraw 3.15.5
+- Vite 7
+
+## Personal Project
+
+This is a personal tool designed for quick concept mapping and idea organization. The constrained feature set is intentional - keeping only what's essential for connecting ideas.
